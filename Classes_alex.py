@@ -1,12 +1,13 @@
 import csv
 import pandas as pd
+
 class ToDoList:
 
-    def __init__(self, titulo, data, categoria, status = 'Pendente'):
-        self.titulo = titulo
-        self.data = data
-        self.categoria = categoria
-        self.status = status
+    def __init__(self, parametros):
+        self.titulo = parametros[0]
+        self.data = parametros[2]
+        self.categoria = parametros[1]
+        self.status = 'Pendente'
         self.filename = 'to_do_list.csv'
 
     def adicionar_linha(filename: str, linha: list):
@@ -20,30 +21,29 @@ class ToDoList:
         except Exception as error:
             print('Erro genérico:', error)
 
-        with open(filename, 'a') as arquivo:
+        with open(self.filename, 'a') as arquivo:
             escritor = csv.writer(arquivo, delimiter=';', lineterminator='\n')
             escritor.writerow(linha)
 
-    def adicionar_tarefa(self):
+    def adicionar_tarefa(self, parametros):
 
         df = pd.read_csv(self.filename)
 
-        self.titulo = input('Qual o título da tarefa?')
-        self.data = input('Qual a sua data de realização?')
-        self.categoria = input('Qual a categoria da tarefa? ')
-        self.status = 'Pendente'
-        
-        linha_tarefa = [self.titulo, self.data, self.categoria, self.status]
-        
+        self.titulo = parametros[0]
         while self.titulo in df['titulo']:
             self.titulo = input('Dê outro nome à tarefa?')
         
-        ToDoList.adicionar_linha(self.filename, linha_tarefa)
+        ToDoList.adicionar_linha(self.filename, parametros)
 
-    def altera_status_tarefa(self, filename, title):
+    @staticmethod
+    def altera_status_tarefa(filename, tarefa):
         
         df = pd.read_csv(filename)
-        linha_titulo = df[df['titulo'] == title]
+        
+        linha_titulo = df[df['titulo'] == tarefa]
+
+        if len(linha_titulo) == 0:
+            print(f'A tarefa: {tarefa} não exista.')
 
         if linha_titulo['status'] == 'Pendete':
             linha_titulo['status'] = 'Concluido'
